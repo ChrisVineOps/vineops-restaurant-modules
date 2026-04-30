@@ -1,0 +1,52 @@
+name: Build & Deploy Restaurant Suite to Bluehost
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: List build output
+        run: ls -la dist/ && ls -la dist/assets/
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Install lftp
+        run: sudo apt-get install -y lftp
+
+      - name: Deploy to Bluehost via lftp SFTP
+        run: |
+          cat >> ~/.ssh/config << EOF
+          Host bluehost-deploy
+              HostName ${{ secrets.SSH_HOST }}
+              User ${{ secrets.SSH_USER }}
+              IdentityFile ~/.ssh/deploy_key
+              StrictHostKeyChecking no
+              PasswordAuthentication no
+          EOF
+          chmod 600 ~/.ssh/config
+          lftp -c "open sftp://bluehost-deploy; mirror -R --delete --no-perms --verbose ./dist/ /home1/pjydwkmy/public_html/restaurant-demos/; bye"
