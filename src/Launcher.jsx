@@ -193,7 +193,7 @@ export default function Launcher() {
       </main>
 
       <footer style={{ backgroundColor: T.dark, padding: '28px 16px', textAlign: 'center' }}>
-        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>© 2026 VineOps · An Oakling Systems Solution</p>
+        <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: 13 }}>© 2026 VineOps, LLC</p>
         <p style={{ marginTop: 8, fontSize: 13 }}>
           <a href="https://oaklingsystems.com/assessment?vertical=restaurant" style={{ color: T.gold }}>
             Get Your Free Beverage Program Assessment →
